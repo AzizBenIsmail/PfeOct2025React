@@ -1,12 +1,38 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 
 // components
 
 import Navbar from "components/Navbars/AuthNavbar.js";
 import Footer from "components/Footers/Footer.js";
+import Pagination from "./Pagination";
 
 export default function Landing() {
+    const cardsData = Array(20).fill({
+    title: "Awarded Agency",
+    description:
+      "Divide details about your product or agency work into parts. A paragraph describing a feature will be enough.",
+    iconClass: "fas fa-award",
+    bgColor: "bg-red-400",
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3; // nombre de cartes par page
+
+  const totalPages = Math.ceil(cardsData.length / itemsPerPage);
+
+  const handlePrev = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNext = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const currentItems = cardsData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
   return (
     <>
       <Navbar transparent />
@@ -40,74 +66,43 @@ export default function Landing() {
               </div>
             </div>
           </div>
-          <div
-            className="top-auto bottom-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden h-70-px"
-            style={{ transform: "translateZ(0)" }}
-          >
-            <svg
-              className="absolute bottom-0 overflow-hidden"
-              xmlns="http://www.w3.org/2000/svg"
-              preserveAspectRatio="none"
-              version="1.1"
-              viewBox="0 0 2560 100"
-              x="0"
-              y="0"
-            >
-              <polygon
-                className="text-blueGray-200 fill-current"
-                points="2560 0 2560 100 0 100"
-              ></polygon>
-            </svg>
-          </div>
+         
         </div>
 
         <section className="pb-20 bg-blueGray-200 -mt-24">
           <div className="container mx-auto px-4">
-            <div className="flex flex-wrap">
-              <div className="lg:pt-12 pt-6 w-full md:w-4/12 px-4 text-center">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
-                  <div className="px-4 py-5 flex-auto">
-                    <div className="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-red-400">
-                      <i className="fas fa-award"></i>
-                    </div>
-                    <h6 className="text-xl font-semibold">Awarded Agency</h6>
-                    <p className="mt-2 mb-4 text-blueGray-500">
-                      Divide details about your product or agency work into
-                      parts. A paragraph describing a feature will be enough.
-                    </p>
-                  </div>
+            <div className="flex flex-wrap pt-32">
+              {currentItems.map((card, index) => (
+          <div key={index} className="lg:pt-12 pt-6 w-full md:w-4/12 px-4 text-center">
+            <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
+              <div className="px-4 py-5 flex-auto">
+                <div className={`text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full ${card.bgColor}`}>
+                  <i className={card.iconClass}></i>
                 </div>
+                <h6 className="text-xl font-semibold">{card.title}</h6>
+                <p className="mt-2 mb-4 text-blueGray-500">{card.description}</p>
               </div>
+            </div>
+          </div>
+        ))}
+      </div>
 
-              <div className="w-full md:w-4/12 px-4 text-center">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
-                  <div className="px-4 py-5 flex-auto">
-                    <div className="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-lightBlue-400">
-                      <i className="fas fa-retweet"></i>
-                    </div>
-                    <h6 className="text-xl font-semibold">Free Revisions</h6>
-                    <p className="mt-2 mb-4 text-blueGray-500">
-                      Keep you user engaged by providing meaningful information.
-                      Remember that by this time, the user is curious.
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-6 w-full md:w-4/12 px-4 text-center">
-                <div className="relative flex flex-col min-w-0 break-words bg-white w-full mb-8 shadow-lg rounded-lg">
-                  <div className="px-4 py-5 flex-auto">
-                    <div className="text-white p-3 text-center inline-flex items-center justify-center w-12 h-12 mb-5 shadow-lg rounded-full bg-emerald-400">
-                      <i className="fas fa-fingerprint"></i>
-                    </div>
-                    <h6 className="text-xl font-semibold">Verified Company</h6>
-                    <p className="mt-2 mb-4 text-blueGray-500">
-                      Write a few lines about each one. A paragraph describing a
-                      feature will be enough. Keep you user engaged!
-                    </p>
-                  </div>
-                </div>
-              </div>
+      <div className="flex justify-center gap-4 mt-4">
+        <button
+          onClick={handlePrev}
+          disabled={currentPage === 1}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Prev
+        </button>
+        <span className="px-4 py-2">{currentPage} / {totalPages}</span>
+        <button
+          onClick={handleNext}
+          disabled={currentPage === totalPages}
+          className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
+        >
+          Next
+        </button>
             </div>
 
             <div className="flex flex-wrap items-center mt-32">

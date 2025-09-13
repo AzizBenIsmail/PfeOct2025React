@@ -121,7 +121,7 @@ export default function Register() {
             <div className="flex flex-wrap mt-6 relative">
               <div className="w-1/2">
                 <Link 
-                  to="/auth/forget"
+                  to="/auth/ForgetPassword"
                   className="text-blueGray-200"
                 >
                   <small>Forgot password?</small>
