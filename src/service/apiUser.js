@@ -6,12 +6,17 @@ export async function getAllUsers(){
     return await axios.get(`${apiUrl}/getAllUsers`)
 }
 
+export async function searchUsersByName(name){
+    return await axios.get(`${apiUrl}/searchUsersByName?name=${name}`)
+}
+
 export async function getOrderAllUsersByAge(){
     return await axios.get(`${apiUrl}/getOrderAllUsersByAge`)
 }
 
 export async function getUserBetweenXAndY(minAge, maxAge){
-    return await axios.get(`${apiUrl}/getUserBetweenXAndY`,{minAge, maxAge})
+    console.log(minAge, maxAge);
+    return await axios.post(`${apiUrl}/getUserBetweenXAndY`,{minAge, maxAge})
 }
 
 export async function deleteUserById(id){
