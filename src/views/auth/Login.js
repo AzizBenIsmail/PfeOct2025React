@@ -1,7 +1,39 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { login } from "../../service/apiUser";
+import { useHistory } from "react-router-dom";
 
 export default function Login() {
+  const history = useHistory();
+  const [user, setUser] = useState({
+    email: "",
+    password: "",
+  });
+
+  const LoginUser = async () => {
+    try {
+      await login(user)
+        .then((response) => {
+          localStorage.setItem("token", response.data.token);
+          localStorage.setItem("role", response.data.user.roles);
+          if (response.data.user.roles === "admin") {
+            history.push("/admin/tables");
+          } else {
+            history.push("/landing");
+          }
+        })
+        .catch((error) => {
+          console.log("Error while calling addUser API ", error);
+        });
+    } catch (error) {
+      console.log("Error while calling getUsers API ", error);
+    }
+  };
+
+  const handleChange = (e) => {
+    setUser({ ...user, [e.target.name]: e.target.value });
+    console.log(user);
+  };
   return (
     <>
       <div className="container mx-auto px-4 h-full">
@@ -11,33 +43,9 @@ export default function Login() {
               <div className="rounded-t mb-0 px-6 py-6">
                 <div className="text-center mb-3">
                   <h6 className="text-blueGray-500 text-sm font-bold">
-                    Wzlcome to 
+                    Wzlcome to
                   </h6>
                 </div>
-                {/* <div className="btn-wrapper text-center">
-                  <button
-                    className="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-2 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    <img
-                      alt="..."
-                      className="w-5 mr-1"
-                      src={require("assets/img/github.svg").default}
-                    />
-                    Github
-                  </button>
-                  <button
-                    className="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    <img
-                      alt="..."
-                      className="w-5 mr-1"
-                      src={require("assets/img/google.svg").default}
-                    />
-                    Google
-                  </button>
-                </div> */}
                 <hr className="mt-6 border-b-1 border-blueGray-300" />
               </div>
               <div className="flex-auto px-4 lg:px-10 py-10 pt-0">
@@ -56,6 +64,8 @@ export default function Login() {
                       type="email"
                       className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                       placeholder="Email"
+                      name="email"
+                      onChange={handleChange}
                     />
                   </div>
 
@@ -70,6 +80,8 @@ export default function Login() {
                       type="password"
                       className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
                       placeholder="Password"
+                      name="password"
+                      onChange={handleChange}
                     />
                   </div>
                   <div>
@@ -89,6 +101,7 @@ export default function Login() {
                     <button
                       className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
                       type="button"
+                      onClick={() => LoginUser()}
                     >
                       Sign In
                     </button>
@@ -98,10 +111,7 @@ export default function Login() {
             </div>
             <div className="flex flex-wrap mt-6 relative">
               <div className="w-1/2">
-                <Link 
-                  to="/auth/ForgetPassword"
-                  className="text-blueGray-200"
-                >
+                <Link to="/auth/ForgetPassword" className="text-blueGray-200">
                   <small>Forgot password?</small>
                 </Link>
               </div>

@@ -3,11 +3,24 @@ import { Link } from "react-router-dom";
 
 // components
 
-import Navbar from "components/Navbars/AuthNavbar.js";
+import Navbar from "components/Navbars/ClientNavbar";
 import Footer from "components/Footers/Footer.js";
 import Pagination from "./Pagination";
+import { useHistory } from "react-router-dom";
 
 export default function Landing() {
+
+  const history = useHistory();
+  
+    const token = localStorage.getItem("token");
+    if (token) {
+      if (localStorage.getItem("role") === "admin") {
+        history.push("/admin/tables");
+      }
+    } else {  
+      history.push("/auth/login");
+    }
+
     const cardsData = Array(20).fill({
     title: "Awarded Agency",
     description:

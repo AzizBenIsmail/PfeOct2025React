@@ -5,6 +5,7 @@ import { Switch, Route, Redirect } from "react-router-dom";
 
 import Navbar from "components/Navbars/AuthNavbar.js";
 import FooterSmall from "components/Footers/FooterSmall.js";
+import { useHistory } from "react-router-dom";
 
 // views
 
@@ -13,6 +14,17 @@ import Register from "views/auth/Register.js";
 import ForgetPassword from "views/auth/ForgetPassword";
 
 export default function Auth() {
+const history = useHistory();
+
+  const token = localStorage.getItem("token");
+  if (token) {
+    if (localStorage.getItem("role") === "admin") {
+      history.push("/admin/tables");
+    } else {
+      history.push("/landing");
+    }
+  }
+
   return (
     <>
       <Navbar transparent />
@@ -26,9 +38,13 @@ export default function Auth() {
             }}
           ></div>
           <Switch>
-          <Route path="/auth/login" exact component={Login} />
-          <Route path="/auth/ForgetPassword" exact component={ForgetPassword} />
-          <Route path="/auth/register" exact component={Register} />
+            <Route path="/auth/login" exact component={Login} />
+            <Route
+              path="/auth/ForgetPassword"
+              exact
+              component={ForgetPassword}
+            />
+            <Route path="/auth/register" exact component={Register} />
             <Redirect from="/auth" to="/auth/login" />
           </Switch>
           <FooterSmall absolute />
