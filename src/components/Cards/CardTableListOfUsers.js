@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import { createPopper } from "@popperjs/core";
+import { QRCodeCanvas } from "qrcode.react";
 
 import {
   addUser,
@@ -199,6 +200,14 @@ export default function CardTableListOfUsers({ color }) {
   };
 
   const history = useHistory();
+
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showQr, setShowQr] = useState(false);
+
+  const handleGenerateQr = (user) => {
+    setSelectedUser(user);
+    setShowQr(true);
+  };
 
   return (
     <>
@@ -476,6 +485,14 @@ export default function CardTableListOfUsers({ color }) {
                       Update
                     </button>
                     <button
+                      className="bg-lightBlue-500 text-white active:bg-lightBlue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150"
+                      type="button"
+                      onClick={() => handleGenerateQr(user)}
+                    >
+                      Generate QRcode
+                    </button>
+
+                    <button
                       className="bg-lightBlue-500 text-white active:bg-lightBlue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                       type="button"
                       onClick={() => deleteUser(user._id)}
@@ -487,6 +504,33 @@ export default function CardTableListOfUsers({ color }) {
               ))}
             </tbody>
           </table>
+          {showQr && selectedUser && (
+            <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-60">
+              <div className="bg-white p-6 rounded-lg shadow-lg text-center">
+                <h2 className="text-xl font-bold mb-4">
+                  QR Code for {selectedUser.firstName} {selectedUser.lastName}
+                </h2>
+
+                <QRCodeCanvas
+                  value={JSON.stringify(selectedUser)} // ou seulement user._id si tu veux
+                  size={200}
+                  bgColor={"#ffffff"}
+                  fgColor={"#000000"}
+                  level={"H"}
+                  includeMargin={true}
+                />
+
+                <div className="mt-4">
+                  <button
+                    className="bg-red-500 text-white px-4 py-2 rounded"
+                    onClick={() => setShowQr(false)}
+                  >
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </>
