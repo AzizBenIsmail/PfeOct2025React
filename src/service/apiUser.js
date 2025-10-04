@@ -26,3 +26,15 @@ export async function deleteUserById(id){
 export async function addUser(userData){
     return await axios.post(`${apiUrl}/addUser`, userData)
 }
+
+export async function addUserWithImg(formData){
+    return await axios.post(`${apiUrl}/addClient`, formData , {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    })
+}
+
+export async function updateUserById(id, updatedData){
+    return await axios.put(`${apiUrl}/updateUser/${id}`, updatedData)
+}

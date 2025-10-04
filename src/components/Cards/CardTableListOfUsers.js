@@ -9,8 +9,11 @@ import {
   getAllUsers,
   getUserBetweenXAndY,
   searchUsersByName,
+  addUserWithImg,
+  updateUser,
 } from "../../service/apiUser";
 
+import { useHistory } from "react-router-dom";
 // components
 
 export default function CardTableListOfUsers({ color }) {
@@ -22,7 +25,7 @@ export default function CardTableListOfUsers({ color }) {
     age: "",
     email: "",
     password: "",
-    user_image: "",
+    image_user: "",
   });
   const [minAge, setMinAge] = useState();
   const [maxAge, setMaxAge] = useState();
@@ -157,6 +160,46 @@ export default function CardTableListOfUsers({ color }) {
     }
   };
 
+  const [image, setImage] = useState();
+
+  const formData = new FormData();
+  const addNewUserWithImg = async () => {
+    try {
+      formData.append("firstName", newUser.firstName);
+      formData.append("lastName", newUser.lastName);
+      formData.append("age", newUser.age);
+      formData.append("email", newUser.email);
+      formData.append("password", newUser.password);
+      formData.append("image_user", image, `${image.name}`);
+
+      console.log(...formData);
+      await addUserWithImg(formData)
+        .then((response) => {
+          getUsers();
+          console.log("user added");
+        })
+        .catch((error) => {
+          console.log("Error while calling addUser API ", error);
+        });
+      setNewUser({
+        firstName: "",
+        lastName: "",
+        age: "",
+        email: "",
+        password: "",
+      });
+    } catch (error) {
+      console.log("Error while calling getUsers API ", error);
+    }
+  };
+
+  const handlechangeFile = (e) => {
+    setImage(e.target.files[0]);
+    console.log(image);
+  };
+
+  const history = useHistory();
+
   return (
     <>
       <div
@@ -251,7 +294,6 @@ export default function CardTableListOfUsers({ color }) {
                             placeholder="First Name"
                             name="firstName"
                             value={newUser.firstName}
-
                             class="px-2 py-1 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-6/12"
                             onChange={handlechange}
                           />
@@ -261,8 +303,7 @@ export default function CardTableListOfUsers({ color }) {
                             name="lastName"
                             class="px-2 ml-2 py-1 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-6/12"
                             onChange={handlechange}
-                                                        value={newUser.lastName}
-
+                            value={newUser.lastName}
                           />
                           <input
                             type="text"
@@ -270,8 +311,7 @@ export default function CardTableListOfUsers({ color }) {
                             name="age"
                             class="px-2 py-1 ml-2 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-6/12"
                             onChange={handlechange}
-                                                        value={newUser.age}
-
+                            value={newUser.age}
                           />
                         </div>
                         <div class="flex gap-4 mb-3">
@@ -281,8 +321,7 @@ export default function CardTableListOfUsers({ color }) {
                             name="email"
                             class="px-2 py-1 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-6/12"
                             onChange={handlechange}
-                                                        value={newUser.email}
-
+                            value={newUser.email}
                           />
                           <input
                             type="password"
@@ -290,10 +329,15 @@ export default function CardTableListOfUsers({ color }) {
                             name="password"
                             class="px-2 ml-2 py-1 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-6/12"
                             onChange={handlechange}
-                                                        value={newUser.password }
-
+                            value={newUser.password}
                           />
                         </div>
+                        <input
+                          type="file"
+                          name="image_user"
+                          class="px-2 py-1 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow outline-none focus:outline-none focus:shadow-outline w-6/12"
+                          onChange={handlechangeFile}
+                        />
                         <button
                           className="bg-lightBlue-500 ml-2 text-white active:bg-lightBlue-600 font-bold uppercase text-xs px-4 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                           type="button"
@@ -307,7 +351,7 @@ export default function CardTableListOfUsers({ color }) {
                         <button
                           className="bg-lightBlue-500 ml-2 text-white active:bg-lightBlue-600 font-bold uppercase text-xs px-4 py-1 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                           type="button"
-                          onClick={() => getUserBetweenAges(minAge, maxAge)}
+                          onClick={() => addNewUserWithImg()}
                         >
                           Add User with Image
                         </button>
@@ -422,9 +466,15 @@ export default function CardTableListOfUsers({ color }) {
                     <button
                       className="bg-lightBlue-500 text-white active:bg-lightBlue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none ease-linear transition-all duration-150"
                       type="button"
+                      onClick={() =>
+                        history.push({
+                          pathname: "/admin/UpdateProfile",
+                          state: { user: user },
+                        })
+                      }
                     >
                       Update
-                    </button>{" "}
+                    </button>
                     <button
                       className="bg-lightBlue-500 text-white active:bg-lightBlue-600 font-bold uppercase text-xs px-4 py-2 rounded shadow hover:shadow-md outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                       type="button"
