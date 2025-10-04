@@ -1,38 +1,58 @@
-import React, {useState} from "react";
-import { Link } from "react-router-dom";
-import {
-  addUser,
-} from "../../service/apiUser";
-import { useHistory } from "react-router-dom";
+import React, { useState } from "react";
+import { Link, useHistory } from "react-router-dom";
+import { addUser } from "../../service/apiUser";
+import { GoogleLogin } from "@react-oauth/google";
+// ⬇️ Correction de l'import
+import { jwtDecode } from "jwt-decode";
 
 export default function Register() {
-
   const history = useHistory();
-   const [newUser, setNewUser] = useState({
-      firstName: "",
-      email: "",
-      password: "",
-    });
+  const [newUser, setNewUser] = useState({
+    firstName: "",
+    email: "",
+    password: "",
+  });
 
-     const addNewUser = async () => {
-        try {
-          await addUser(newUser)
-            .then((response) => {
-              console.log("user added");
-              history.push("/auth/login");
-            })
-            .catch((error) => {
-              console.log("Error while calling addUser API ", error);
-            });
-        } catch (error) {
-          console.log("Error while calling getUsers API ", error);
-        }
-      };
-
-    const handleChange = (e) => {
-      setNewUser({ ...newUser, [e.target.name]: e.target.value });
-      console.log(newUser);
+  const addNewUser = async () => {
+    try {
+      await addUser(newUser)
+        .then(() => {
+          console.log("user added");
+          history.push("/auth/login");
+        })
+        .catch((error) => {
+          console.log("Error while calling addUser API ", error);
+        });
+    } catch (error) {
+      console.log("Error while calling getUsers API ", error);
     }
+  };
+
+  const handleChange = (e) => {
+    setNewUser({ ...newUser, [e.target.name]: e.target.value });
+  };
+
+  // Callback Google Login
+  const handleGoogleSuccess = (credentialResponse) => {
+    const decoded = jwtDecode(credentialResponse.credential); // ⬅️ Utilisation corrigée
+    console.log("Google User:", decoded);
+
+    // Récupération des données
+    const googleUser = {
+      firstName: decoded.given_name,
+      email: decoded.email,
+      password: "google_oauth", // placeholder
+    };
+
+    // Enregistrement ou connexion
+    addUser(googleUser).then(() => {
+      history.push("/auth/login");
+    });
+  };
+
+  const handleGoogleFailure = () => {
+    console.log("Google login failed");
+  };
 
   return (
     <>
@@ -47,28 +67,11 @@ export default function Register() {
                   </h6>
                 </div>
                 <div className="btn-wrapper text-center">
-                  <button
-                    className="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-2 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    <img
-                      alt="..."
-                      className="w-5 mr-1"
-                      src={require("assets/img/github.svg").default}
-                    />
-                    Github
-                  </button>
-                  <button
-                    className="bg-white active:bg-blueGray-50 text-blueGray-700 font-normal px-4 py-2 rounded outline-none focus:outline-none mr-1 mb-1 uppercase shadow hover:shadow-md inline-flex items-center font-bold text-xs ease-linear transition-all duration-150"
-                    type="button"
-                  >
-                    <img
-                      alt="..."
-                      className="w-5 mr-1"
-                      src={require("assets/img/google.svg").default}
-                    />
-                    Google
-                  </button>
+                  {/* Google Login Button */}
+                  <GoogleLogin
+                    onSuccess={handleGoogleSuccess}
+                    onError={handleGoogleFailure}
+                  />
                 </div>
                 <hr className="mt-6 border-b-1 border-blueGray-300" />
               </div>
@@ -78,78 +81,49 @@ export default function Register() {
                 </div>
                 <form>
                   <div className="relative w-full mb-3">
-                    <label
-                      className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                      htmlFor="grid-password"
-                    >
+                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
                       FirstName
                     </label>
                     <input
                       type="text"
-                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="FirstName"
                       name="firstName"
                       onChange={handleChange}
+                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                      placeholder="FirstName"
                     />
                   </div>
 
                   <div className="relative w-full mb-3">
-                    <label
-                      className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                      htmlFor="grid-password"
-                    >
+                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
                       Email
                     </label>
                     <input
                       type="email"
-                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Email"
                       name="email"
                       onChange={handleChange}
+                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                      placeholder="Email"
                     />
                   </div>
 
                   <div className="relative w-full mb-3">
-                    <label
-                      className="block uppercase text-blueGray-600 text-xs font-bold mb-2"
-                      htmlFor="grid-password"
-                    >
+                    <label className="block uppercase text-blueGray-600 text-xs font-bold mb-2">
                       Password
                     </label>
                     <input
                       type="password"
-                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
-                      placeholder="Password"
                       name="password"
                       onChange={handleChange}
+                      className="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow focus:outline-none focus:ring w-full ease-linear transition-all duration-150"
+                      placeholder="Password"
                     />
-                  </div>
-
-                  <div>
-                    <label className="inline-flex items-center cursor-pointer">
-                      <input
-                        id="customCheckLogin"
-                        type="checkbox"
-                        className="form-checkbox border-0 rounded text-blueGray-700 ml-1 w-5 h-5 ease-linear transition-all duration-150"
-                      />
-                      <span className="ml-2 text-sm font-semibold text-blueGray-600">
-                        I agree with the{" "}
-                        <a
-                          href="#pablo"
-                          className="text-lightBlue-500"
-                          onClick={(e) => e.preventDefault()}
-                        >
-                          Privacy Policy
-                        </a>
-                      </span>
-                    </label>
                   </div>
 
                   <div className="text-center mt-6">
                     <button
-                      className="bg-blueGray-800 text-white active:bg-blueGray-600 text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg outline-none focus:outline-none mr-1 mb-1 w-full ease-linear transition-all duration-150"
                       type="button"
-                      onClick={()=> addNewUser()}
+                      onClick={() => addNewUser()}
+                      className="bg-blueGray-800 text-white text-sm font-bold uppercase px-6 py-3 rounded shadow hover:shadow-lg w-full ease-linear transition-all duration-150"
                     >
                       Create Account
                     </button>
@@ -159,10 +133,7 @@ export default function Register() {
             </div>
             <div className="flex flex-wrap mt-6 relative">
               <div className="w-1/2">
-                <Link 
-                  to="/auth/ForgetPassword"
-                  className="text-blueGray-200"
-                >
+                <Link to="/auth/ForgetPassword" className="text-blueGray-200">
                   <small>Forgot password?</small>
                 </Link>
               </div>
